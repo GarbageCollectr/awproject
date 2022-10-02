@@ -1,28 +1,35 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using awprojectdata;
 using awprojectmodels;
+using Microsoft.Extensions.Caching.Memory;
+using awproject.Models;
 
 namespace awproject.Controllers
 {
     public class StatesController : Controller
     {
         private readonly AwProjectDbContext _context;
+        private IMemoryCache _cache;
 
-        public StatesController(AwProjectDbContext context)
+        public StatesController(AwProjectDbContext context, IMemoryCache cache)
         {
             _context = context;
+            _cache = cache;
         }
 
         // GET: States
         public async Task<IActionResult> Index()
         {
-              return View(await _context.States.ToListAsync());
+            var allStates = new List<State>();
+            if(!_cache.TryGetValue(ContactCacheConstants.ALL_STATES, out allStates))
+            {
+               var allStatesData = await _context.States.ToListAsync();
+
+                _cache.Set(ContactCacheConstants.ALL_STATES, allStatesData, TimeSpan.FromHours(12));
+                return View(allStatesData);
+            }
+              return View(allStates);
         }
 
         // GET: States/Details/5
@@ -60,6 +67,7 @@ namespace awproject.Controllers
             {
                 _context.Add(state);
                 await _context.SaveChangesAsync();
+                _cache.Remove(ContactCacheConstants.ALL_STATES);
                 return RedirectToAction(nameof(Index));
             }
             return View(state);
@@ -97,8 +105,9 @@ namespace awproject.Controllers
             {
                 try
                 {
-                    _context.Update(state);
+                    _context.Update(state);                  
                     await _context.SaveChangesAsync();
+                    _cache.Remove(ContactCacheConstants.ALL_STATES);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -150,6 +159,7 @@ namespace awproject.Controllers
             }
             
             await _context.SaveChangesAsync();
+            _cache.Remove(ContactCacheConstants.ALL_STATES);
             return RedirectToAction(nameof(Index));
         }
 
