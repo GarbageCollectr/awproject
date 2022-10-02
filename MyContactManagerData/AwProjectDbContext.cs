@@ -29,7 +29,7 @@ namespace awprojectdata
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
             _configuration = builder.Build();
-            var cnstr = _configuration.GetConnectionString("MyContactManager");
+            var cnstr = _configuration.GetConnectionString("AwProjectConnection");
             optionsBuilder.UseSqlServer(cnstr);
 
         }

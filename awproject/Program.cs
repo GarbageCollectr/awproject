@@ -1,4 +1,5 @@
 using awproject.Data;
+using awprojectdata;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,6 +14,9 @@ namespace awproject
             // Add services to the container.
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
+                options.UseSqlServer(connectionString));
+            var awProjectContext = builder.Configuration.GetConnectionString("AwProjectConnection") ?? throw new InvalidOperationException("Connection string 'awProjectConnection' not found.");
+            builder.Services.AddDbContext<AwProjectDbContext>(options =>
                 options.UseSqlServer(connectionString));
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
