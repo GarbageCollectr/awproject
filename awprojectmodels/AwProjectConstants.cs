@@ -1,6 +1,6 @@
 ﻿namespace awprojectmodels
 {
-    public class ContactManagerConstants
+    public class AwProjectConstants
     {
         public const int MAX_STATE_NAME_LENGTH = 50;
         public const int MAX_STATE_ABBR_LENGTH = 4;
