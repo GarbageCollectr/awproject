@@ -69,7 +69,6 @@ namespace awprojectrepositories
 
             await Task.Run(() => { _context.States.Remove(existingState); });
 
-
             await _context.SaveChangesAsync();
             return id;
         }
