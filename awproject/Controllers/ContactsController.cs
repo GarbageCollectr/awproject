@@ -9,19 +9,22 @@ using awprojectdata;
 using awprojectmodels;
 using awproject.Models;
 using Microsoft.Extensions.Caching.Memory;
+using awprojectservices;
 
 namespace awproject.Controllers
 {
     public class ContactsController : Controller
     {
-        private readonly AwProjectDbContext _context;
-        private static List<State> _allStates;
+        private readonly IContactsService _contactsService;
+        private readonly IStatesService _statesService;
+        private static IList<State> _allStates;
         private static SelectList _statesData;
         private IMemoryCache _cache;
 
-        public ContactsController(AwProjectDbContext context, IMemoryCache cache)
+        public ContactsController(IContactsService contactsService, IStatesService statesService, IMemoryCache cache)
         {
-            _context = context;
+            _contactsService = contactsService;
+            _statesService = statesService;
             _cache = cache;
             SetAllStatesCachingData();
             _statesData = new SelectList(_allStates, "Id", "Abbreviation");
@@ -33,7 +36,7 @@ namespace awproject.Controllers
             var allStates = new List<State>();
             if (!_cache.TryGetValue(ContactCacheConstants.ALL_STATES, out allStates))
             {
-                var allStatesData = Task.Run(() => _context.States.ToListAsync()).Result;
+                var allStatesData = Task.Run(() => _statesService.GetAllAsync()).Result;
 
                 _cache.Set(ContactCacheConstants.ALL_STATES, allStatesData, TimeSpan.FromHours(12));
                 _allStates = _cache.Get(ContactCacheConstants.ALL_STATES) as List<State>;
@@ -52,21 +55,19 @@ namespace awproject.Controllers
         // GET: Contacts
         public async Task<IActionResult> Index()
         {
-            var contacts = _context.Contacts.Include(c => c.State);
-            return View(await contacts.ToListAsync());
+            var contacts = await _contactsService.GetAllAsync();
+            return View(contacts);
         }
 
         // GET: Contacts/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || _context.Contacts == null)
+            if (id == null)
             {
                 return NotFound();
             }
 
-            var contact = await _context.Contacts
-                .Include(c => c.State)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var contact = await _contactsService.GetAsync((int)id);
             if (contact == null)
             {
                 return NotFound();
@@ -89,14 +90,10 @@ namespace awproject.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,FirstName,LastName,Email,PhonePrimary,PhoneSecondary,Birthday,StreetAddress1,StreetAddress2,City,Zip,StateId,UserId")] Contact contact)
         {
-            UpdateStateAndResetModelState(contact);
+            await UpdateStateAndResetModelState(contact);
             if (ModelState.IsValid)
             {
-                //hack to get the state hydrated
-                var state = await _context.States.SingleOrDefaultAsync(x => x.Id == contact.StateId);
-                contact.State = state;
-                await _context.Contacts.AddAsync(contact);
-                await _context.SaveChangesAsync();
+                await _contactsService.AddOrUpdateAsync(contact);
                 return RedirectToAction(nameof(Index));
             }
             ViewData["StateId"] = _statesData;
@@ -106,12 +103,12 @@ namespace awproject.Controllers
         // GET: Contacts/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || _context.Contacts == null)
+            if (id == null)
             {
                 return NotFound();
             }
 
-            var contact = await _context.Contacts.FindAsync(id);
+            var contact = await _contactsService.GetAsync((int)id);
             if (contact == null)
             {
                 return NotFound();
@@ -131,17 +128,16 @@ namespace awproject.Controllers
             {
                 return NotFound();
             }
-            UpdateStateAndResetModelState(contact);
+            await UpdateStateAndResetModelState(contact);
             if (ModelState.IsValid)
             {
                 try
                 {
-                    _context.Contacts.Update(contact);
-                    await _context.SaveChangesAsync();
+                    await _contactsService.AddOrUpdateAsync(contact);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ContactExists(contact.Id))
+                    if (! await ContactExists(contact.Id))
                     {
                         return NotFound();
                     }
@@ -159,14 +155,12 @@ namespace awproject.Controllers
         // GET: Contacts/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null || _context.Contacts == null)
+            if (id == null)
             {
                 return NotFound();
             }
 
-            var contact = await _context.Contacts
-                .Include(c => c.State)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var contact = await _contactsService.GetAsync((int)id);
             if (contact == null)
             {
                 return NotFound();
@@ -180,23 +174,13 @@ namespace awproject.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (_context.Contacts == null)
-            {
-                return Problem("Entity set 'AwProjectDbContext.Contacts'  is null.");
-            }
-            var contact = await _context.Contacts.FindAsync(id);
-            if (contact != null)
-            {
-                _context.Contacts.Remove(contact);
-            }
-            
-            await _context.SaveChangesAsync();
+            await _contactsService.DeleteAsync(id);
             return RedirectToAction(nameof(Index));
         }
 
-        private bool ContactExists(int id)
+        private async Task<bool> ContactExists(int id)
         {
-          return _context.Contacts.Any(e => e.Id == id);
+          return await _contactsService.ExistsAsync(id);
         }
     }
 }
