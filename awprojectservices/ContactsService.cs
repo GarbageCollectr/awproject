@@ -17,7 +17,7 @@ namespace awprojectservices
             return await _contactsRepository.GetAllAsync();
         }
 
-        public async Task<Contact> GetAsync(int id)
+        public async Task<Contact?> GetAsync(int id)
         {
             return await _contactsRepository.GetAsync(id);
         }

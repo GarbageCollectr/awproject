@@ -97,7 +97,5 @@ namespace awprojectrepositories
                                     .AsNoTracking()
                                     .AnyAsync(x => x.Id == id);
         }
-
-
     }
 }

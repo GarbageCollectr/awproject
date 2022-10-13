@@ -55,7 +55,7 @@ namespace awproject.Controllers
         // GET: Contacts
         public async Task<IActionResult> Index()
         {
-            var contacts = _contactsService.GetAllAsync();
+            var contacts = await _contactsService.GetAllAsync();
             return View(contacts);
         }
 
@@ -90,7 +90,7 @@ namespace awproject.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,FirstName,LastName,Email,PhonePrimary,PhoneSecondary,Birthday,StreetAddress1,StreetAddress2,City,Zip,StateId,UserId")] Contact contact)
         {
-           await UpdateStateAndResetModelState(contact);
+            await UpdateStateAndResetModelState(contact);
             if (ModelState.IsValid)
             {
                 await _contactsService.AddOrUpdateAsync(contact);
