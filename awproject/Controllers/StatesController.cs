@@ -27,7 +27,7 @@ namespace awproject.Controllers
             {
                var allStatesData = await _statesService.GetAllAsync() as List<State>;
 
-                _cache.Set(ContactCacheConstants.ALL_STATES, allStatesData, TimeSpan.FromHours(12));
+                _cache.Set(ContactCacheConstants.ALL_STATES, allStatesData, TimeSpan.FromDays(1));
                 return View(allStatesData);
             }
               return View(allStates);

@@ -8,8 +8,8 @@ namespace awprojectmodels
         public int Id { get; set; }
         public string ExamBank { get; set; } = null!;
         public DateTime DateTime { get; set; }
-        [Display(Name="Exam Score")]
-        public float Score { get; set; }
-        public List<Question> ExamQuestions { get; set; }
+        //[Display(Name="Exam Score")]
+        //public float Score { get; set; }
+        //public List<Question> ExamQuestions { get; set; }
     }
 }

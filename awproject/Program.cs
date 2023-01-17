@@ -19,7 +19,7 @@ namespace awproject
                 options.UseSqlServer(connectionString));
             var awProjectContext = builder.Configuration.GetConnectionString("AwProjectConnection") ?? throw new InvalidOperationException("Connection string 'awProjectConnection' not found.");
             builder.Services.AddDbContext<AwProjectDbContext>(options =>
-                options.UseSqlServer(connectionString));
+                options.UseSqlServer(awProjectContext));
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
             builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)

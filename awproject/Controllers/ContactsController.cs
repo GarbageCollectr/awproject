@@ -12,7 +12,7 @@ namespace awproject.Controllers
     {
         private readonly IContactsService _contactsService;
         private readonly IStatesService _statesService;
-        private static IList<State> _allStates;
+        private static List<State> _allStates;
         private static SelectList _statesData;
         private IMemoryCache _cache;
 
