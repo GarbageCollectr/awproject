@@ -18,12 +18,15 @@ namespace awprojectrepositories
             var results =  await _context.Contacts.Include(x=>x.State)
                 .AsNoTracking()
                 .ToListAsync();
-            return results.OrderBy(x => x.LastName).ThenBy(x=>x.FirstName).ToList();
+            return results.OrderBy(x => x.LastName)
+                .ThenBy(x=>x.FirstName)
+                .ToList();
         }
 
         public async Task<Contact?> GetAsync(int id)
         {
-            var result = await _context.Contacts.AsNoTracking()
+            var result = await _context.Contacts
+                .AsNoTracking()
                 .SingleOrDefaultAsync(x => x.Id == id);
             return result;
         }
@@ -82,7 +85,8 @@ namespace awprojectrepositories
 
         public async Task<int> DeleteAsync(int id)
         {
-            var existingContact = await _context.Contacts.SingleOrDefaultAsync(x => x.Id == id);
+            var existingContact = await _context.Contacts
+                .SingleOrDefaultAsync(x => x.Id == id);
             if (existingContact is null) throw new Exception("Could not delete Contact due to unable to find");
 
             await Task.Run(() => { _context.Contacts.Remove(existingContact); });

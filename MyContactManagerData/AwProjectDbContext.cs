@@ -10,6 +10,8 @@ namespace awprojectdata
 
         public DbSet<State> States { get; set; }
         public DbSet<Contact> Contacts { get; set; }
+        public DbSet<Question> Questions { get; set; }
+        public DbSet<Exam> Exams { get; set; }
 
         public AwProjectDbContext()
         {

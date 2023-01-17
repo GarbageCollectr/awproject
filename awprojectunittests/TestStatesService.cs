@@ -87,7 +87,7 @@ namespace awprojectunittests
         [Fact]
         public async Task TestGetAState()
         {
-            var state = await _statesService.GetAsync(3);
+            var state = await _statesService.GetAsync(2);
             state.ShouldNotBeNull();
             state.Name.ShouldBe("Alaska", StringCompareShould.IgnoreCase);
             state.Abbreviation.ShouldBe("AK", StringCompareShould.IgnoreCase);
