@@ -15,18 +15,15 @@ namespace awprojectrepositories
         }
         public async Task<IList<State>> GetAllAsync()
         {
-            return await _context.States
-                                .AsNoTracking()
-                                .ToListAsync();
+            var states = await _context.States.AsNoTracking().ToListAsync();
+            return states;
             
         }
 
         public async Task<State?> GetAsync(int id)
         {
-            return await _context.States
-                                .AsNoTracking()
-                                .SingleOrDefaultAsync(x => x.Id == id);
-
+            var state = await _context.States.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+            return state;
         }
 
         public async Task<int> AddOrUpdateAsync(State state)
