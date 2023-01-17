@@ -33,8 +33,8 @@ namespace awproject.Controllers
             {
                 var allStatesData = Task.Run(() => _statesService.GetAllAsync()).Result;
 
-                _cache.Set(ContactCacheConstants.ALL_STATES, allStatesData, TimeSpan.FromHours(12));
-                _allStates = _cache.Get(ContactCacheConstants.ALL_STATES) as List<State>;
+                _cache.Set(ContactCacheConstants.ALL_STATES, allStatesData, TimeSpan.FromDays(1));
+                allStates = _cache.Get(ContactCacheConstants.ALL_STATES) as List<State>;
             }
             _allStates = allStates;
         }
