@@ -6,7 +6,8 @@ namespace awprojectmodels
     {
         [Key]
         public int Id { get; set; }
-        public string ExamBank { get; set; } = null!;
+        [Required(ErrorMessage = "Exam Name and Version is Required")]
+        public string ExamVersion { get; set; } = null!;
         [Required(ErrorMessage = "Question is Required")]
         public string ExamQuestion { get; set; } = null!;
         [Required(ErrorMessage = "Answers are Required")]

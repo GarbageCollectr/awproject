@@ -10,6 +10,8 @@ namespace awprojectunittests
     {
         private IContactsService _contactsService;
         private Mock<IContactsRepository> _contactsRepository;
+        private IList<State> _statesData;
+        private IList<Contact> _contactsData;
         private const int NUMBER_OF_CONTACTS = 5;
         private const string USERID1 = "477f8f3a-c343-40b5-b34a-7b8977e1a65d";
         private const string USERID2 = "f4a2d35d-4a49-4a12-8445-752857124620";
@@ -44,6 +46,17 @@ namespace awprojectunittests
             var singleContact = GetSingleContact();
             _contactsRepository.Setup(x => x.GetAllAsync()).Returns(contacts);
             _contactsRepository.Setup(x => x.GetAsync(It.IsAny<int>())).Returns(singleContact);
+        }
+
+        private async Task<IList<State>> GetStatesTestData()
+        {
+            return new List<State>() {
+                new State() { Id = 1, Name = "Alabama", Abbreviation = "AL" },
+                new State() { Id = 2, Name = "Alaska", Abbreviation = "AK" },
+                new State() { Id = 3, Name = "Arizona", Abbreviation = "AZ" },
+                new State() { Id = 4, Name = "Arkansas", Abbreviation = "AR" },
+                new State() { Id = 5, Name = "California", Abbreviation = "CA" }
+            };
         }
 
         private async Task<IList<Contact>> GetContactsTestData()
@@ -116,7 +129,5 @@ namespace awprojectunittests
             contact.UserId.ShouldBe(USERID2, StringCompareShould.IgnoreCase);
             contact.StateId.ShouldBe(2);
         }
-
-
     }
 }
